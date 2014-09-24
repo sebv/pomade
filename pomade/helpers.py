@@ -304,8 +304,12 @@ class BaseSeleniumTestCase(TestCase):
                 "Content-Type": "application/octet-stream",
                 "Authorization": "Basic %s" % base64string
             })
-        result = connection.getresponse()
-        return result.status == 200
+        res = connection.getresponse()
+        if(res.status == 200):
+            data = res.read()
+            return json.loads(data)
+        else:
+            raise Exception("Could not upload the %s file." % file_name)
 
 
 class Selenium2TestCase(BaseSeleniumTestCase, Selenium2TestHelpers, PomadeAssertions):
