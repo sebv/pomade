@@ -291,6 +291,22 @@ class BaseSeleniumTestCase(TestCase):
         result = connection.getresponse()
         return result.status == 200
 
+    def storage_upload(self, file_name, data, overwrite=True):
+        base64string = base64.encodestring('%s:%s' % (self.username,
+                                                      self.access_key))[:-1]
+        connection = httplib.HTTPConnection(self.host)
+        storage_url = '/rest/v1/storage/%s/%s' % (self.username, file_name)
+        if overwrite:
+            storage_url = storage_url + "?overwrite=true"
+        connection.request(
+            'POST', storage_url, data,
+            headers={
+                "Content-Type": "application/octet-stream",
+                "Authorization": "Basic %s" % base64string
+            })
+        result = connection.getresponse()
+        return result.status == 200
+
 
 class Selenium2TestCase(BaseSeleniumTestCase, Selenium2TestHelpers, PomadeAssertions):
     os = None
